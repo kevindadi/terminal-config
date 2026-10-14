@@ -1,0 +1,98 @@
+# ~/terminal — 终端美化 dotfiles
+
+面向 **Rust / C++ / Python** 开发 + **Git** 工作流的 SSH 远程终端配置（Rocky Linux 9）。
+
+## 组件一览
+
+| 组件 | 作用 | 安装位置 |
+|---|---|---|
+| zsh + oh-my-zsh | Shell 本体及插件框架 | `/usr/bin/zsh`, `~/.oh-my-zsh` |
+| zsh-autosuggestions / syntax-highlighting | 灰色历史建议（`→` 接受）、命令语法高亮 | omz 插件目录 |
+| starship | 提示符（gruvbox-rainbow 配色） | `~/.local/bin/starship` |
+| fzf | `Ctrl+R` 历史 / `Ctrl+T` 文件 / `Alt+C` 目录 模糊搜索 | dnf |
+| zoxide | `z 目录关键词` 智能跳转 | dnf |
+| eza | `ls` 替代（图标 + git 状态列） | `~/.local/bin/eza` |
+| bat | `cat` 替代（语法高亮） | dnf |
+| fd / ripgrep | 快速找文件 / 找内容 | dnf |
+| git-delta | `git diff` 彩色并排显示 | dnf |
+| tmux | 会话复用 + gruvbox 状态栏 | dnf |
+
+## 目录结构（stow 风格）
+
+```
+~/terminal/
+├── install.sh                     # 一键建立软链接（换机器时直接跑）
+├── README.md
+├── zsh/.zshrc                     # -> ~/.zshrc
+├── starship/.config/starship.toml # -> ~/.config/starship.toml
+├── git/.gitconfig                 # -> ~/.gitconfig
+├── tmux/.tmux.conf                # -> ~/.tmux.conf
+└── bat/.config/bat/config         # -> ~/.config/bat/config
+```
+
+所有配置通过软链接生效：**直接改 `~/terminal` 里的文件即可**，改完 `reload` 重载 zsh（tmux 用 `前缀+r`）。
+
+## 日常使用
+
+### 别名速查
+
+| 分类 | 别名 | 含义 |
+|---|---|---|
+| 文件 | `ls` `ll` `la` `lt` `ltt` | eza 列表 / 长格式 / 含隐藏 / 树形2层 / 树形3层 |
+| 文件 | `cat` `catn` | bat 高亮 / 带行号 |
+| Rust | `c` `cr` `cb` `cbr` `ck` `ct` `cf` `cl` `ca` `cu` | cargo / run / build / build --release / check / test / fmt / clippy / add / update |
+| C++ | `mk` `cmk` `cmkr` `cmb` | make -j / cmake -B build / Release 配置 / 构建 |
+| Python | `py` `pip` `venv` `act` `deact` | python3 / pip3 / 建 .venv / 激活 / 退出 |
+| Git | `git s` `git d` `git l` `git la` `git last` `git p` `git pl` | status / diff / 图形日志 / 全部日志 / 最近一次提交 / push / pull --rebase |
+| 其他 | `reload` `path` `ports` `z 关键词` | 重载配置 / 查看 PATH / 监听端口 / zoxide 跳转 |
+
+### 快捷键
+
+- **fzf**：`Ctrl+R` 搜历史命令，`Ctrl+T` 搜文件（带预览），`Alt+C` 跳目录
+- **zsh**：`→` 或 `End` 接受灰色建议
+- **tmux**（前缀 `Ctrl+B`）：
+  - `|` / `-` 竖切 / 横切面板，`h/j/k/l` 切换面板
+  - `H/J/K/L` 调整面板大小，`r` 重载配置
+
+### tmux 常用
+
+```bash
+tmux           # 新建会话
+tmux a         # 恢复上次会话（断线不丢）
+tmux ls        # 列出会话
+```
+
+## 换机器 / 重装
+
+```bash
+# 1. 系统包
+sudo dnf install -y zsh tmux fzf ripgrep fd-find bat git-delta zoxide stow
+
+# 2. 用户级工具（GitHub 加速下载）
+curl -sL "https://ghfast.top/https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz" | tar xz -C ~/.local/bin starship
+curl -sL "https://ghfast.top/https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-musl.tar.gz" | tar xz -C ~/.local/bin ./eza
+
+# 3. oh-my-zsh + 插件（gitee 镜像）
+git clone --depth 1 https://gitee.com/mirrors/oh-my-zsh.git ~/.oh-my-zsh
+git clone --depth 1 https://gitee.com/mirrors/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+git clone --depth 1 https://gitee.com/mirrors/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+
+# 4. cargo 补全
+mkdir -p ~/.local/share/zsh/site-functions
+rustup completions zsh > ~/.local/share/zsh/site-functions/_rustup
+rustup completions zsh cargo > ~/.local/share/zsh/site-functions/_cargo
+
+# 5. 软链接
+bash ~/terminal/install.sh
+chsh -s /usr/bin/zsh
+```
+
+## 本地终端要求
+
+- 本机 SSH 客户端终端需使用 **Nerd Font** 字体（如 JetBrainsMono Nerd Font、FiraCode Nerd Font、Maple Mono NF），否则图标字符会显示为方块。
+- 建议开启真彩色（Windows Terminal / iTerm2 / WezTerm 默认支持）。
+
+## 升级与回滚
+
+- 升级 starship / eza：重新执行上面第 2 步的下载命令即可。
+- 回滚：删掉软链接，把 `~/*.bak-*` 备份恢复即可。
