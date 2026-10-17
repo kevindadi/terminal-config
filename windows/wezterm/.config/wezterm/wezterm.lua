@@ -78,45 +78,33 @@ config.default_cursor_style = 'SteadyBlock'
 config.inactive_pane_hsb = { saturation = 0.75, brightness = 0.7 }  -- 未聚焦面板变暗
 config.audible_bell = 'Disabled'
 config.check_for_updates = false           -- 关闭自动更新检查 (网络原因)
-config.automatically_reload_config = true  -- 编辑后自动重载; 手动: 前缀键 + r
+config.automatically_reload_config = true  -- 编辑后自动重载; 或 Ctrl+Shift+R 手动重载
 
 -- ---------------------------------------------------------------------------
--- 5. 快捷键 (仿 tmux: 前缀键 Ctrl+B)
+-- 5. 快捷键 (以 WezTerm 默认键位为主, 只加少量自定义;
+--    默认清单: https://wezterm.org/config/default-keys.html)
 -- ---------------------------------------------------------------------------
-config.leader = { key = 'b', mods = 'CTRL', timeout_milliseconds = 1000 }
-
+-- 常用默认键 (无需配置):
+--   Ctrl+Shift+T / Ctrl+Shift+W    新建 / 关闭标签
+--   Ctrl+Tab / Ctrl+Shift+Tab      切换标签
+--   Ctrl+Shift+方向键              切换面板            Alt+Enter 全屏
+--   Ctrl+Shift+Z                   面板最大化/还原     Ctrl+Shift+X 复制模式
+--   Ctrl+Shift+R                   重载配置            Ctrl+Shift+P 命令面板
+--   Ctrl+Shift+C / Ctrl+Shift+V    复制 / 粘贴
+--   Ctrl+= / Ctrl+- / Ctrl+0       字号放大 / 缩小 / 复位
 config.keys = {
-    -- 面板: | 竖切 / - 横切 / hjkl 切换 / HJKL 调大小 / z 最大化
-    { key = '|',  mods = 'LEADER|SHIFT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-    { key = '\\', mods = 'LEADER',       action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-    { key = '-',  mods = 'LEADER',       action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },
-    { key = 'h',  mods = 'LEADER', action = act.ActivatePaneDirection 'Left'  },
-    { key = 'j',  mods = 'LEADER', action = act.ActivatePaneDirection 'Down'  },
-    { key = 'k',  mods = 'LEADER', action = act.ActivatePaneDirection 'Up'    },
-    { key = 'l',  mods = 'LEADER', action = act.ActivatePaneDirection 'Right' },
-    { key = 'H',  mods = 'LEADER|SHIFT', action = act.AdjustPaneSize { 'Left', 5 }  },
-    { key = 'J',  mods = 'LEADER|SHIFT', action = act.AdjustPaneSize { 'Down', 5 }  },
-    { key = 'K',  mods = 'LEADER|SHIFT', action = act.AdjustPaneSize { 'Up', 5 }    },
-    { key = 'L',  mods = 'LEADER|SHIFT', action = act.AdjustPaneSize { 'Right', 5 } },
-    { key = 'z',  mods = 'LEADER', action = act.TogglePaneZoomState },
-    { key = 'x',  mods = 'LEADER', action = act.CloseCurrentPane { confirm = true } },
+    -- 分屏 (默认的 Ctrl+Shift+Alt+% / " 也仍然可用)
+    { key = 'RightArrow', mods = 'ALT|SHIFT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },  -- 向右分屏
+    { key = 'DownArrow',  mods = 'ALT|SHIFT', action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },  -- 向下分屏
 
-    -- 标签页 (对应 tmux 的窗口)
-    { key = 'c', mods = 'LEADER', action = act.SpawnTab 'CurrentPaneDomain' },
-    { key = 'n', mods = 'LEADER', action = act.ActivateTabRelative(1) },
-    { key = 'p', mods = 'LEADER', action = act.ActivateTabRelative(-1) },
+    -- 关闭当前面板
+    { key = 'q', mods = 'CTRL|SHIFT', action = act.CloseCurrentPane { confirm = true } },
 
-    -- 其他
-    { key = 'r', mods = 'LEADER', action = act.ReloadConfiguration },   -- 重载配置
-    { key = '[', mods = 'LEADER', action = act.ActivateCopyMode },      -- 复制模式 (vi 键位, q 退出)
-    { key = 'w', mods = 'LEADER', action = act.ShowLauncherArgs { flags = 'FUZZY|TABS' } },
-    { key = 's', mods = 'LEADER', action = act.ShowLauncherArgs { flags = 'FUZZY|DOMAINS' } },   -- 连接菜单 (SSH 域)
-    { key = 'Space', mods = 'CTRL|SHIFT', action = act.ShowLauncherArgs { flags = 'FUZZY|LAUNCH_MENU_ITEMS' } },
+    -- SSH 连接菜单 (rocky / ~/.ssh/config 里的主机)
+    { key = 's', mods = 'CTRL|SHIFT', action = act.ShowLauncherArgs { flags = 'FUZZY|DOMAINS' } },
 
-    -- 字号缩放
-    { key = '=', mods = 'CTRL', action = act.IncreaseFontSize },
-    { key = '-', mods = 'CTRL', action = act.DecreaseFontSize },
-    { key = '0', mods = 'CTRL', action = act.ResetFontSize },
+    -- 启动菜单 (PowerShell 7 / 5.1 / CMD / WSL)
+    { key = 'l', mods = 'ALT', action = act.ShowLauncherArgs { flags = 'FUZZY|LAUNCH_MENU_ITEMS' } },
 }
 
 -- ---------------------------------------------------------------------------
@@ -126,7 +114,7 @@ config.keys = {
 -- 再追加一个命名域。当前为普通 SSH 模式, 服务器无需安装任何东西; 会话保持用 tmux (tmux a)。
 local ssh_domains = wezterm.default_ssh_domains()
 table.insert(ssh_domains, {
-    name = 'rocky',                          -- wezterm connect rocky, 或前缀键 Ctrl+B 再按 s
+    name = 'rocky',                          -- wezterm connect rocky, 或 Ctrl+Shift+S 连接菜单
     remote_address = '192.168.0.118',
     username = 'kevin',
     multiplexing = 'None',                   -- 普通 SSH; 断线即断

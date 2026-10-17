@@ -54,20 +54,32 @@ pwsh -File E:\local-repos\terminal-config\windows\install.ps1
 
 ## 快捷键
 
-### WezTerm（前缀键 `Ctrl+B`，与 tmux 一致）
+### WezTerm（以默认键位为主，自定义部分见下）
+
+常用默认键：
 
 | 按键 | 作用 |
 |---|---|
-| `前缀 + \|` / `前缀 + -` | 竖切 / 横切面板 |
-| `前缀 + h/j/k/l` | 切换面板 |
-| `前缀 + H/J/K/L` | 调整面板大小 |
-| `前缀 + z` | 当前面板最大化 / 还原 |
-| `前缀 + c` / `n` / `p` / `x` | 新建标签页 / 下一个 / 上一个 / 关闭面板 |
-| `前缀 + [` | 复制模式（vi 键位，`q` 退出） |
-| `前缀 + s` | 连接菜单（SSH 直连：`rocky` / ssh config 主机） |
-| `前缀 + r` | 重载配置 |
-| `Ctrl+Shift+空格` | 启动菜单（PowerShell 7 / 5.1 / CMD） |
+| `Ctrl+Shift+T` / `Ctrl+Shift+W` | 新建 / 关闭标签 |
+| `Ctrl+Tab` / `Ctrl+Shift+Tab` | 切换标签 |
+| `Ctrl+Shift+方向键` | 切换面板 |
+| `Ctrl+Shift+Z` | 当前面板最大化 / 还原 |
+| `Ctrl+Shift+X` | 复制模式（vi 键位，`q` 退出） |
+| `Ctrl+Shift+R` | 重载配置 |
+| `Ctrl+Shift+C` / `Ctrl+Shift+V` | 复制 / 粘贴 |
 | `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | 字号放大 / 缩小 / 复位 |
+| `Alt+Enter` | 全屏 |
+
+自定义键（本仓库添加）：
+
+| 按键 | 作用 |
+|---|---|
+| `Alt+Shift+→` / `Alt+Shift+↓` | 向右 / 向下分屏 |
+| `Ctrl+Shift+Q` | 关闭当前面板 |
+| `Ctrl+Shift+S` | 连接菜单（SSH 直连：`rocky` / ssh config 主机） |
+| `Alt+L` | 启动菜单（PowerShell 7 / 5.1 / CMD / WSL） |
+
+想改键：编辑 `wezterm.lua` 第 5 节 `config.keys`（格式 `{ key = 'x', mods = 'CTRL|SHIFT', action = act.XXX }`），保存即自动重载；`wezterm show-keys --lua` 查看当前全部键位，动作名见 [默认键位文档](https://wezterm.org/config/default-keys.html)。
 
 ### PowerShell（PSReadLine）
 
@@ -84,7 +96,7 @@ pwsh -File E:\local-repos\terminal-config\windows\install.ps1
 WezTerm 内置 SSH 客户端，不用另开 ssh 命令；已配置好 `rocky` 域（`kevin@192.168.0.118`），并自动读取 `~/.ssh/config` 中已有的主机。
 
 - `wezterm connect rocky` —— 新窗口直连服务器
-- 前缀键 `Ctrl+B` 再按 `s` —— 弹出连接菜单（`rocky` + ssh config 自动发现的主机）
+- `Ctrl+Shift+S` —— 弹出连接菜单（`rocky` + ssh config 自动发现的主机）
 - 在已开窗口中新增标签：`wezterm cli spawn --domain-name rocky`
 
 当前为**普通 SSH 模式**（`multiplexing = 'None'`），断线即断，会话保持沿用服务器上的 tmux（`tmux a`）。若以后想要"断线重连恢复现场"（WezTerm 原生会话），需在服务器安装与客户端同版本的 wezterm 二进制，并把域配置改为 `multiplexing = 'WezTerm'`（`wezterm.lua` 里有注释说明）。
