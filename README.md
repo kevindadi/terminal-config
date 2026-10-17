@@ -1,6 +1,9 @@
 # ~/terminal — 终端美化 dotfiles
 
-面向 **Rust / C++ / Python** 开发 + **Git** 工作流的 SSH 远程终端配置（Rocky Linux 9）。
+面向 **Rust / C++ / Python** 开发 + **Git** 工作流的终端配置，两端共用一套 gruvbox 视觉与别名习惯：
+
+- **SSH 远程端**（Rocky Linux 9）：zsh + oh-my-zsh + tmux（本文档主体）
+- **Windows 本机**（WezTerm + PowerShell 7）：见 [windows/README.md](windows/README.md)
 
 ## 组件一览
 
@@ -27,7 +30,11 @@
 ├── starship/.config/starship.toml # -> ~/.config/starship.toml
 ├── git/.gitconfig                 # -> ~/.gitconfig
 ├── tmux/.tmux.conf                # -> ~/.tmux.conf
-└── bat/.config/bat/config         # -> ~/.config/bat/config
+├── bat/.config/bat/config         # -> ~/.config/bat/config
+└── windows/                       # Windows 本机 (WezTerm + PowerShell 7)
+    ├── install.ps1                # 一键安装 / 修复加载器
+    ├── wezterm/.config/wezterm/wezterm.lua
+    └── pwsh/Microsoft.PowerShell_profile.ps1
 ```
 
 所有配置通过软链接生效：**直接改 `~/terminal` 里的文件即可**，改完 `reload` 重载 zsh（tmux 用 `前缀+r`）。
@@ -86,6 +93,16 @@ rustup completions zsh cargo > ~/.local/share/zsh/site-functions/_cargo
 bash ~/terminal/install.sh
 chsh -s /usr/bin/zsh
 ```
+
+## Windows 本机（WezTerm + PowerShell 7）
+
+与远程端同款 gruvbox（starship / bat / git 配置共用本仓库文件），一键装齐：
+
+```powershell
+pwsh -File E:\local-repos\terminal-config\windows\install.ps1
+```
+
+组件清单、快捷键（WezTerm 前缀键 `Ctrl+B`，与 tmux 一致）、别名、维护说明见 [windows/README.md](windows/README.md)。
 
 ## 本地终端要求
 
