@@ -110,6 +110,7 @@ config.keys = {
     { key = 'r', mods = 'LEADER', action = act.ReloadConfiguration },   -- 重载配置
     { key = '[', mods = 'LEADER', action = act.ActivateCopyMode },      -- 复制模式 (vi 键位, q 退出)
     { key = 'w', mods = 'LEADER', action = act.ShowLauncherArgs { flags = 'FUZZY|TABS' } },
+    { key = 's', mods = 'LEADER', action = act.ShowLauncherArgs { flags = 'FUZZY|DOMAINS' } },   -- 连接菜单 (SSH 域)
     { key = 'Space', mods = 'CTRL|SHIFT', action = act.ShowLauncherArgs { flags = 'FUZZY|LAUNCH_MENU_ITEMS' } },
 
     -- 字号缩放
@@ -117,5 +118,24 @@ config.keys = {
     { key = '-', mods = 'CTRL', action = act.DecreaseFontSize },
     { key = '0', mods = 'CTRL', action = act.ResetFontSize },
 }
+
+-- ---------------------------------------------------------------------------
+-- 6. SSH 域 (WezTerm 内置 SSH 客户端: 标签共享连接, 免重复认证)
+-- ---------------------------------------------------------------------------
+-- 保留 ~/.ssh/config 自动发现的主机 (SSH:主机 普通连接 / SSHMUX:主机 复用连接),
+-- 再追加一个命名域。当前为普通 SSH 模式, 服务器无需安装任何东西; 会话保持用 tmux (tmux a)。
+local ssh_domains = wezterm.default_ssh_domains()
+table.insert(ssh_domains, {
+    name = 'rocky',                          -- wezterm connect rocky, 或前缀键 Ctrl+B 再按 s
+    remote_address = '192.168.0.118',
+    username = 'kevin',
+    multiplexing = 'None',                   -- 普通 SSH; 断线即断
+    default_prog = { 'zsh', '-l' },          -- 新标签/分屏直接进 zsh
+    assume_shell = 'Posix',                  -- 新面板尝试继承远程工作目录 (需远程 shell 上报 OSC 7)
+    -- 若以后升级为 WezTerm 原生会话 (断线重连恢复现场):
+    --   1) 服务器装与客户端同版本的 wezterm 二进制 (解压到 ~/.local 即可)
+    --   2) 这里改为 multiplexing = 'WezTerm' 并加 remote_wezterm_path 指向远端二进制
+})
+config.ssh_domains = ssh_domains
 
 return config

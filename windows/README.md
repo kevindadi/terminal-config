@@ -64,6 +64,7 @@ pwsh -File E:\local-repos\terminal-config\windows\install.ps1
 | `前缀 + z` | 当前面板最大化 / 还原 |
 | `前缀 + c` / `n` / `p` / `x` | 新建标签页 / 下一个 / 上一个 / 关闭面板 |
 | `前缀 + [` | 复制模式（vi 键位，`q` 退出） |
+| `前缀 + s` | 连接菜单（SSH 直连：`rocky` / ssh config 主机） |
 | `前缀 + r` | 重载配置 |
 | `Ctrl+Shift+空格` | 启动菜单（PowerShell 7 / 5.1 / CMD） |
 | `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | 字号放大 / 缩小 / 复位 |
@@ -77,6 +78,16 @@ pwsh -File E:\local-repos\terminal-config\windows\install.ps1
 | `Ctrl+R` / `Ctrl+T` | fzf 搜历史命令 / 搜文件 |
 | `Tab` | 补全菜单（可上下选择） |
 | `z 关键词` | zoxide 跳转目录 |
+
+## SSH 直连（内置 SSH 域）
+
+WezTerm 内置 SSH 客户端，不用另开 ssh 命令；已配置好 `rocky` 域（`kevin@192.168.0.118`），并自动读取 `~/.ssh/config` 中已有的主机。
+
+- `wezterm connect rocky` —— 新窗口直连服务器
+- 前缀键 `Ctrl+B` 再按 `s` —— 弹出连接菜单（`rocky` + ssh config 自动发现的主机）
+- 在已开窗口中新增标签：`wezterm cli spawn --domain-name rocky`
+
+当前为**普通 SSH 模式**（`multiplexing = 'None'`），断线即断，会话保持沿用服务器上的 tmux（`tmux a`）。若以后想要"断线重连恢复现场"（WezTerm 原生会话），需在服务器安装与客户端同版本的 wezterm 二进制，并把域配置改为 `multiplexing = 'WezTerm'`（`wezterm.lua` 里有注释说明）。
 
 ## 别名速查（与 Linux 端一致的部分）
 
