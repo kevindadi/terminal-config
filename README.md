@@ -23,21 +23,23 @@
 ## 目录结构（stow 风格）
 
 ```
-~/terminal/
+~/terminal-config/
 ├── install.sh                     # 一键建立软链接（换机器时直接跑）
 ├── README.md
 ├── zsh/.zshrc                     # -> ~/.zshrc
 ├── starship/.config/starship.toml # -> ~/.config/starship.toml
-├── git/.gitconfig                 # -> ~/.gitconfig
+├── git/.gitconfig                 # -> ~/.gitconfig（本机私有项走 ~/.gitconfig.local）
 ├── tmux/.tmux.conf                # -> ~/.tmux.conf
 ├── bat/.config/bat/config         # -> ~/.config/bat/config
+├── cargo/.cargo/config.toml       # -> ~/.cargo/config.toml（rsproxy 镜像）
 └── windows/                       # Windows 本机 (WezTerm + PowerShell 7)
     ├── install.ps1                # 一键安装 / 修复加载器
     ├── wezterm/.config/wezterm/wezterm.lua
     └── pwsh/Microsoft.PowerShell_profile.ps1
 ```
 
-所有配置通过软链接生效：**直接改 `~/terminal` 里的文件即可**，改完 `reload` 重载 zsh（tmux 用 `前缀+r`）。
+所有配置通过软链接生效：**直接改 `~/terminal-config` 里的文件即可**，改完 `reload` 重载 zsh（tmux 用 `前缀+r`）。
+本机私有项（git 身份/凭据、额外 PATH 等）放 `~/.gitconfig.local`、`~/.zshrc.local`，不进仓库。
 
 ## 日常使用
 
@@ -71,9 +73,14 @@ tmux ls        # 列出会话
 
 ## 换机器 / 重装
 
+> 仓库克隆到哪都行（本机为 `~/terminal-config`），install.sh 按实际路径建链接。
+
 ```bash
 # 1. 系统包
+#   Rocky / Fedora:
 sudo dnf install -y zsh tmux fzf ripgrep fd-find bat git-delta zoxide stow
+#   Ubuntu / Debian:
+sudo apt install -y zsh tmux fzf ripgrep fd-find bat git-delta zoxide stow
 
 # 2. 用户级工具（GitHub 加速下载）
 curl -sL "https://ghfast.top/https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz" | tar xz -C ~/.local/bin starship
@@ -84,15 +91,22 @@ git clone --depth 1 https://gitee.com/mirrors/oh-my-zsh.git ~/.oh-my-zsh
 git clone --depth 1 https://gitee.com/mirrors/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 git clone --depth 1 https://gitee.com/mirrors/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 
-# 4. cargo 补全
-mkdir -p ~/.local/share/zsh/site-functions
-rustup completions zsh > ~/.local/share/zsh/site-functions/_rustup
-rustup completions zsh cargo > ~/.local/share/zsh/site-functions/_cargo
+# 4. rustup（走 rsproxy 代理；已有 rustup 的机器跳过）
+export RUSTUP_DIST_SERVER=https://rsproxy.cn
+export RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
 
-# 5. 软链接
-bash ~/terminal/install.sh
+# 5. 软链接（含 cargo rsproxy 镜像、rustup 补全；Ubuntu 会自动补 fd/bat 用户级软链）
+bash ~/terminal-config/install.sh
 chsh -s /usr/bin/zsh
 ```
+
+### rustup / cargo 镜像（rsproxy）说明
+
+- `~/.zshrc` 导出 `RUSTUP_DIST_SERVER` / `RUSTUP_UPDATE_ROOT`，rustup 下载工具链走 rsproxy；
+- `~/.cargo/config.toml` 由本仓库软链接提供（crates.io 源替换为 rsproxy 稀疏索引）；
+- 若机器上已有旧式 `~/.cargo/config`（无扩展名，cargo 优先读它），`install.sh` 会自动备份并让位给 `config.toml`；
+- 默认工具链在 rustup 安装时指定（本机为 `nightly`），补全文件由 `install.sh` 生成。
 
 ## Windows 本机（WezTerm + PowerShell 7）
 
