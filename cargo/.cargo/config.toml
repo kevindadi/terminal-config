@@ -1,0 +1,22 @@
+# ===========================================================================
+#  ~/terminal-config dotfiles — cargo 镜像配置 (rsproxy.cn)
+#  软链接: ~/.cargo/config.toml -> ~/terminal-config/cargo/.cargo/config.toml
+#  说明:   crates.io 源替换为 rsproxy 稀疏索引，配合 .zshrc 中的
+#          RUSTUP_DIST_SERVER / RUSTUP_UPDATE_ROOT 组成完整的 Rust 国内镜像。
+#  注意:   若存在旧式 ~/.cargo/config（无扩展名），cargo 会优先读它，
+#          install.sh 会自动将其备份为 ~/.cargo/config.bak-<时间戳>。
+# ===========================================================================
+[source.crates-io]
+replace-with = 'rsproxy-sparse'
+
+[source.rsproxy]
+registry = "https://rsproxy.cn/crates.io-index"
+
+[source.rsproxy-sparse]
+registry = "sparse+https://rsproxy.cn/index/"
+
+[registries.rsproxy]
+index = "https://rsproxy.cn/crates.io-index"
+
+[net]
+git-fetch-with-cli = true

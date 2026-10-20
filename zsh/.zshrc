@@ -74,8 +74,15 @@ export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git --exclude target -
 export FZF_DEFAULT_OPTS='--height=50% --layout=reverse --border=rounded --info=inline --color=bg+:#3c3836,bg:#282828,spinner:#fb4934,hl:#928374,fg:#ebdbb2,header:#928374,info:#8ec07c,pointer:#fb4934,marker:#fb4934,fg+:#ebdbb2,prompt:#fabd2f,hl+:#fabd2f'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range=:300 {} 2>/dev/null'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --color=always --icons=always {} 2>/dev/null'"
-if command -v fzf >/dev/null 2>&1 && [ -f /usr/share/fzf/shell/key-bindings.zsh ]; then
-    source /usr/share/fzf/shell/key-bindings.zsh
+if command -v fzf >/dev/null 2>&1; then
+    # Rocky/Fedora: /usr/share/fzf/...   Ubuntu/Debian: /usr/share/doc/fzf/examples/...
+    for _fzf_kn in /usr/share/fzf/shell/key-bindings.zsh /usr/share/doc/fzf/examples/key-bindings.zsh; do
+        if [ -f "$_fzf_kn" ]; then
+            source "$_fzf_kn"
+            break
+        fi
+    done
+    unset _fzf_kn
 fi
 
 # ---------------------------------------------------------------------------

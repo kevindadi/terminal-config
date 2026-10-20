@@ -67,3 +67,7 @@
 	stl = stash list
 	stp = stash pop
 	cl = clean -fd
+
+# 本机私有覆盖（提交身份 / 凭据等，不进仓库；文件不存在时 git 自动忽略）
+[include]
+	path = ~/.gitconfig.local
